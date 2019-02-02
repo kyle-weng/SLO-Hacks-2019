@@ -41,6 +41,26 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
+        Button b2 = (Button) findViewById(R.id.buttonmain1);
+        b2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                /*
+                Insert code for "button"
+                 */
+            }
+        });
+
+        Button b3 = (Button) findViewById(R.id.buttonmain2);
+        b3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                /*
+                Insert code for "Drop a marker"
+                 */
+            }
+        });
+
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
