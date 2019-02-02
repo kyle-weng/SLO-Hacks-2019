@@ -1,8 +1,21 @@
 package com.example.navtest1;
 
+import android.content.DialogInterface;
+import android.content.pm.PackageManager;
+import android.location.LocationListener;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
+import android.util.Log;
+import android.widget.FrameLayout;
+import android.widget.TextView;
+
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.location.Location;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.view.View;
@@ -16,8 +29,34 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.Api;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.LocationServices;
+// import com.google.android.gms.location.places.GeoDataClient;
+// import com.google.android.gms.location.places.PlaceDetectionClient;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.tasks.OnSuccessListener;
+
+import java.io.FileDescriptor;
+import java.io.PrintWriter;
+import java.util.concurrent.TimeUnit;
+
+/*
+import com.google.android.gms.maps;
+import com.google.android.gms.maps.GoogleMap.OnMapLongClickListener;
+import com.google.android.gms.maps.LocationSource;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+*/
+
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+    private FusedLocationProviderClient mFusedLocationClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,7 +64,8 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
+        // mGoogleApiClient = new GoogleApiClient.Builder()
+        // mGeoDataClient = Places.getGeoDataClient(this, null);
 
         Button button1 = (Button) findViewById(R.id.button1);
         button1.setOnClickListener(new View.OnClickListener() {
@@ -40,6 +80,18 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         });
+
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        mFusedLocationClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
+            @Override
+            public void onSuccess(Location location) {
+                if (location != null) {
+                    // What will we do with this location
+                    // Use the location to find the public facilities that are near this location
+                }
+            }
+        });
+
 
         Button b2 = (Button) findViewById(R.id.buttonmain1);
         b2.setOnClickListener(new View.OnClickListener() {
