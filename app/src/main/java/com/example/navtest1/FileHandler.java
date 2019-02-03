@@ -27,7 +27,6 @@ import java.io.ObjectOutputStream;
 import java.nio.file.Files;
 
 public class FileHandler {
-
     private Context testContext;
     //private FileHandler handler;
     private FirebaseStorage storage;
