@@ -198,29 +198,15 @@ public class MainActivity extends AppCompatActivity
         buttonCurrentLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                double latitude = 42.0;
-                double longitude = -71.0;
                 getLastKnownLocation();
-                latitude = location.getLatitude();
-                longitude = location.getLongitude();
+                double latitude = location.getLatitude();
+                double longitude = location.getLongitude();
                 Uri gmmIntentUri = Uri.parse("geo:" + latitude + ", " + longitude);
                 Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
                 mapIntent.setPackage("com.google.android.apps.maps");
                 if (mapIntent.resolveActivity(getPackageManager()) != null) {
                     startActivity(mapIntent);
                 }
-
-
-                /*
-                GetLocation gps = new GetLocation();
-                if (gps.canGetLocation()) {
-                    latitude = gps.getLatitude();
-                    longitude = gps.getLongitude();
-                } else {
-                    latitude = 42.0;
-                    longitude = -71.0;
-                }
-                */
             }
         });
 
@@ -318,7 +304,15 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_share) {
 
         } else if (id == R.id.nav_send) {
-
+            getLastKnownLocation();
+            double latitude = this.location.getLatitude();
+            double longitude = this.location.getLongitude();
+            Uri gmmIntentUri = Uri.parse("geo:" + latitude + ", " + longitude);
+            Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+            mapIntent.setPackage("com.google.android.apps.maps");
+            if (mapIntent.resolveActivity(getPackageManager()) != null) {
+                startActivity(mapIntent);
+            }
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
