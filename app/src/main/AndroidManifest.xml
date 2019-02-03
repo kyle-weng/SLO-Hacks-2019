@@ -30,6 +30,15 @@
             </intent-filter>
 
         </activity>
+        <activity
+            android:name=".MapActivity"
+            android:label="@string/activity2_name"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.navtest1.MainActivity" />
+        </activity>
+
     </application>
 
 </manifest>

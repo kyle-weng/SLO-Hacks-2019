@@ -5,8 +5,10 @@ import android.content.Context;
 import android.graphics.Point;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.google.android.gms.auth.api.signin.internal.Storage;
+import com.google.android.gms.common.util.IOUtils;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FileDownloadTask;
@@ -17,6 +19,7 @@ import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -24,30 +27,47 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
-import java.nio.file.Files;
 
 public class FileHandler {
     private Context testContext;
     //private FileHandler handler;
     private FirebaseStorage storage;
     private StorageReference mStorageRef;
-    private Uri identifier;
     private ObjectOutput out;
+    private static final String URL = "gs://slo-hacks-2019-60f66.appspot.com";
+    private static final String TAG = "FileHandler";
 
     //private PointOfInterest poi;
 
 
     public FileHandler() {
         //handler = new FileHandler();
-        storage = FirebaseStorage.getInstance();
-        mStorageRef = storage.getReferenceFromUrl("gs://slo-hacks-2019-60f66.appspot.com");
-        identifier = null;
+        this.storage = FirebaseStorage.getInstance();
+        this.mStorageRef = storage.getReferenceFromUrl(URL);
         //poi = null;
-        out = null;
+        this.out = null;
     }
 
-    public void setIdentifier(String filepath) {
-        identifier = Uri.fromFile(new File(filepath));
+    public InputStream fileToInputStream(File in) throws IOException {
+        File initialFile = new File("src/main/resources/sample.txt");
+        InputStream targetStream = new FileInputStream(initialFile);
+        return targetStream;
+    }
+
+    /*
+     * This is a good link which talks about IOUtils versus manually writing a byte array output stream.
+     * The below solution implements the second method
+     * https://stackoverflow.com/questions/11540018/android-compile-error-util-tobytearray-taken-from-an-example
+     */
+    public byte[] inputStreamToByteArray(InputStream in) throws IOException {
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        int l;
+        byte[] data = new byte[1024];
+        while ((l = in.read(data, 0, data.length)) != -1) {
+            buffer.write(data, 0, l);
+        }
+        buffer.flush();
+        return buffer.toByteArray();
     }
 
     public byte[] convertToByteArray(PointOfInterest in) {
@@ -55,9 +75,9 @@ public class FileHandler {
         //turn this thing into a byte array
         byte[] fileContents = null;
         try {
-            out = new ObjectOutputStream(bos);
-            out.writeObject(in);
-            out.flush();
+            this.out = new ObjectOutputStream(bos);
+            this.out.writeObject(in);
+            this.out.flush();
             fileContents = bos.toByteArray();
         } catch (Exception e) {
             System.out.println("That didn't work :(");
@@ -82,7 +102,7 @@ public class FileHandler {
         FileOutputStream outputStream;
 
         try {
-            outputStream = testContext.openFileOutput(filename + ".xf", Context.MODE_PRIVATE);
+            outputStream = this.testContext.openFileOutput(filename + ".xf", Context.MODE_PRIVATE);
             outputStream.write(fileContents);
             outputStream.close();
         } catch (Exception e) {
@@ -95,7 +115,7 @@ public class FileHandler {
      * https://stackoverflow.com/questions/5837698/converting-any-object-to-a-byte-array-in-java
      * this is the sketchiest thing in the world pls test
      */
-    public PointOfInterest deserialize(byte[] bytes) throws IOException, ClassNotFoundException {
+    public PointOfInterest deserializeBytes(byte[] bytes) throws IOException, ClassNotFoundException {
         try(ByteArrayInputStream b = new ByteArrayInputStream(bytes)){
             try(ObjectInputStream o = new ObjectInputStream(b)){
                 return (PointOfInterest)o.readObject();
@@ -108,7 +128,7 @@ public class FileHandler {
      * https://firebase.google.com/docs/storage/android/upload-files
      */
     public void upload(PointOfInterest in) {
-        StorageReference ref = mStorageRef.child(in.getName() + ".xf");
+        StorageReference ref = this.mStorageRef.child(in.getName() + ".xf");
         byte[] fileContents = convertToByteArray(in);
 
         UploadTask task = ref.putBytes(fileContents);
@@ -116,11 +136,13 @@ public class FileHandler {
             @Override
             public void onFailure(@NonNull Exception e) {
                 System.out.println("Upload failed");
+                Log.d(TAG, "Upload failed");
             }
         }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                 // taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
+                Log.d(TAG, "Upload successful!");
             }
         });
     }
@@ -131,18 +153,21 @@ public class FileHandler {
      * https://firebase.google.com/docs/storage/android/download-files
      */
     public File download(String filename) {
-        StorageReference gsReference = storage.getReferenceFromUrl("gs://slo-hacks-2019-60f66.appspot.com/" + filename + ".xf");
+        StorageReference gsReference = this.storage.getReferenceFromUrl(URL + "/" + filename + ".xf");
         File localFile = new File(filename + ".xf");
 
         gsReference.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
                 // Local temp file has been created
+                Log.d(TAG, "Successful download!");
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception exception) {
                 // Handle any errors
+                System.out.println("Lol it doesn't work");
+                Log.d(TAG, "The file was not downloaded");
             }
         });
         return localFile;
