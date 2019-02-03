@@ -43,9 +43,18 @@ import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+
 
 import static com.example.navtest1.Constants.ERROR_DIALOG_REQUEST;
 import static com.example.navtest1.Constants.PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION;
@@ -172,13 +181,16 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        // setContentView(R.layout.activity_maps); We don't have this layout
+        /*
+        We need a R.id.map
+
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        mapFragment.getMapAsync((OnMapReadyCallback) this);
+        */
+
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-
         getLastKnownLocation();
-        // mGoogleApiClient = new GoogleApiClient.Builder()
-        // mGeoDataClient = Places.getGeoDataClient(this, null);
-
-
 
         Button button1 = (Button) findViewById(R.id.buttonmain2);
         button1.setOnClickListener(new View.OnClickListener() {
@@ -239,7 +251,12 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
     }
 
-
+    protected void onMapReady(GoogleMap googleMap) {
+        this.getLastKnownLocation();
+        LatLng currLocation = new LatLng(this.location.getLatitude(), this.location.getLongitude());
+        googleMap.addMarker(new MarkerOptions().position(currLocation).title("Current Location"));
+        googleMap.moveCamera(CameraUpdateFactory.newLatLng(currLocation));
+    }
 
 
     /*
