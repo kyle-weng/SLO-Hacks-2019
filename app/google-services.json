@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "347813065860",
+    "firebase_url": "https://slo-hacks-2019pt2.firebaseio.com",
+    "project_id": "slo-hacks-2019pt2",
+    "storage_bucket": "slo-hacks-2019pt2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:347813065860:android:94bf49f3438d61ce",
+        "android_client_info": {
+          "package_name": "com.example.navtest1"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "347813065860-470gs7fbfdrnkg8sm9980prqblniq2u8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.navtest1",
+            "certificate_hash": "bdd133290a9cb1ee58954ef6133bd1713f1c7761"
+          }
+        },
+        {
+          "client_id": "347813065860-48q9cf7731ouifrojpg1lre80efvj7ke.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBtdtAv4SNa-gBzQV8zLSgubqhGsTiadrQ"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "347813065860-48q9cf7731ouifrojpg1lre80efvj7ke.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
