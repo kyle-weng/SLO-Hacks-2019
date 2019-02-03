@@ -34,7 +34,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.Toast;
-
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.Api;
@@ -178,19 +177,12 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+    //https://developer.android.com/reference/android/R.id
 
-        // setContentView(R.layout.activity_maps); We don't have this layout
-        /*
-        We need a R.id.map
-
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-        mapFragment.getMapAsync((OnMapReadyCallback) this);
-        */
-
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         getLastKnownLocation();
-
-        Button button1 = (Button) findViewById(R.id.buttonmain2);
+        
+        Button button1 = (Button) findViewById(R.id.button1);
         button1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -204,7 +196,7 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        Button buttonCurrentLocation = (Button) findViewById(R.id.button1);
+        Button buttonCurrentLocation = (Button) findViewById(R.id.buttonmain2);
         buttonCurrentLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -234,8 +226,8 @@ public class MainActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "You clicked an amazing button", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
+                startActivity(intent);
             }
         });
 
@@ -282,7 +274,7 @@ public class MainActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            return true;
+            return True
         }
 
         return super.onOptionsItemSelected(item);
@@ -295,15 +287,13 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_camera) {
-            // Handle the camera action
-            Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
-            startActivity(intent);
+            Toast.makeText(this, "These buttons don't really do anything...", Toast.LENGTH_SHORT).show();
         } else if (id == R.id.nav_gallery) {
-
+            Toast.makeText(this, "Selfie gallery", Toast.LENGTH_SHORT).show();
         } else if (id == R.id.nav_slideshow) {
-
+            Toast.makeText(this, "Show me da wae", Toast.LENGTH_SHORT).show();
         } else if (id == R.id.nav_manage) {
-
+            Toast.makeText(this, "Don't be a tool", Toast.LENGTH_SHORT).show();
         } else if (id == R.id.nav_share) {
             Intent intent = new Intent(this, MapActivity.class);
             // intent.setData(Uri.fromFile(new File("file")));
