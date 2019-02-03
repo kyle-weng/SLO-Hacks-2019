@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Point;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.google.android.gms.auth.api.signin.internal.Storage;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -33,6 +34,8 @@ public class FileHandler {
     private StorageReference mStorageRef;
     private Uri identifier;
     private ObjectOutput out;
+    private static final String URL = "gs://slo-hacks-2019-60f66.appspot.com";
+    private static final String TAG = "FileHandler";
 
     //private PointOfInterest poi;
 
@@ -40,7 +43,7 @@ public class FileHandler {
     public FileHandler() {
         //handler = new FileHandler();
         storage = FirebaseStorage.getInstance();
-        mStorageRef = storage.getReferenceFromUrl("gs://slo-hacks-2019-60f66.appspot.com");
+        mStorageRef = storage.getReferenceFromUrl(URL);
         identifier = null;
         //poi = null;
         out = null;
@@ -116,11 +119,13 @@ public class FileHandler {
             @Override
             public void onFailure(@NonNull Exception e) {
                 System.out.println("Upload failed");
+                Log.d(TAG, "Upload failed");
             }
         }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                 // taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
+                Log.d(TAG, "Upload successful!");
             }
         });
     }
@@ -138,11 +143,14 @@ public class FileHandler {
             @Override
             public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
                 // Local temp file has been created
+                Log.d(TAG, "Successful download!");
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception exception) {
                 // Handle any errors
+                System.out.println("Lol it doesn't work");
+                Log.d(TAG, "The file was not downloaded");
             }
         });
         return localFile;
