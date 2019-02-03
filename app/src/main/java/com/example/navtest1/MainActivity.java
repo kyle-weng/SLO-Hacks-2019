@@ -182,7 +182,8 @@ public class MainActivity extends AppCompatActivity
 mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         getLastKnownLocation();
         
-        Button button1 = (Button) findViewById(R.id.button1);
+
+        /*
         button1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -195,9 +196,11 @@ mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
                 }
             }
         });
+        */
 
-        Button buttonCurrentLocation = (Button) findViewById(R.id.buttonmain2);
-        buttonCurrentLocation.setOnClickListener(new View.OnClickListener() {
+        // Button buttonCurrentLocation = (Button) findViewById(R.id.button1);
+        Button button1 = (Button) findViewById(R.id.button1);
+        button1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 getLastKnownLocation();
@@ -212,15 +215,14 @@ mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
             }
         });
 
+        /*
         Button b2 = (Button) findViewById(R.id.buttonmain1);
         b2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                /*
-                Insert code for "button"
-                 */
             }
         });
+        */
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -274,7 +276,7 @@ mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            return True
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
