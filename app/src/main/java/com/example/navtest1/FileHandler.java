@@ -42,11 +42,11 @@ public class FileHandler {
 
     public FileHandler() {
         //handler = new FileHandler();
-        storage = FirebaseStorage.getInstance();
-        mStorageRef = storage.getReferenceFromUrl(URL);
-        identifier = null;
+        this.storage = FirebaseStorage.getInstance();
+        this.mStorageRef = storage.getReferenceFromUrl(URL);
+        this.identifier = null;
         //poi = null;
-        out = null;
+        this.out = null;
     }
 
     public void setIdentifier(String filepath) {
@@ -58,9 +58,9 @@ public class FileHandler {
         //turn this thing into a byte array
         byte[] fileContents = null;
         try {
-            out = new ObjectOutputStream(bos);
-            out.writeObject(in);
-            out.flush();
+            this.out = new ObjectOutputStream(bos);
+            this.out.writeObject(in);
+            this.out.flush();
             fileContents = bos.toByteArray();
         } catch (Exception e) {
             System.out.println("That didn't work :(");
@@ -85,7 +85,7 @@ public class FileHandler {
         FileOutputStream outputStream;
 
         try {
-            outputStream = testContext.openFileOutput(filename + ".xf", Context.MODE_PRIVATE);
+            outputStream = this.testContext.openFileOutput(filename + ".xf", Context.MODE_PRIVATE);
             outputStream.write(fileContents);
             outputStream.close();
         } catch (Exception e) {
@@ -111,7 +111,7 @@ public class FileHandler {
      * https://firebase.google.com/docs/storage/android/upload-files
      */
     public void upload(PointOfInterest in) {
-        StorageReference ref = mStorageRef.child(in.getName() + ".xf");
+        StorageReference ref = this.mStorageRef.child(in.getName() + ".xf");
         byte[] fileContents = convertToByteArray(in);
 
         UploadTask task = ref.putBytes(fileContents);
@@ -136,7 +136,7 @@ public class FileHandler {
      * https://firebase.google.com/docs/storage/android/download-files
      */
     public File download(String filename) {
-        StorageReference gsReference = storage.getReferenceFromUrl("gs://slo-hacks-2019-60f66.appspot.com/" + filename + ".xf");
+        StorageReference gsReference = this.storage.getReferenceFromUrl(URL + "/" + filename + ".xf");
         File localFile = new File(filename + ".xf");
 
         gsReference.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {

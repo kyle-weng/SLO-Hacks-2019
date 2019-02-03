@@ -1,7 +1,9 @@
 package com.example.navtest1;
 
+import android.content.Intent;
 import android.graphics.Point;
 import android.location.Location;
+import android.net.Uri;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 
@@ -34,6 +36,9 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback{
         Find a way to get locationList from an inputted file.
 
          */
+        Intent intent = getIntent();
+        Uri locationUri = intent.getData();
+        // locationUri is the link for the firebase storage site?
     }
 
     @Override

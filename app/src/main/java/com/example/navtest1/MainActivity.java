@@ -56,6 +56,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 
+import java.io.File;
+
 import static com.example.navtest1.Constants.ERROR_DIALOG_REQUEST;
 import static com.example.navtest1.Constants.PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION;
 import static com.example.navtest1.Constants.PERMISSIONS_REQUEST_ENABLE_GPS;
@@ -254,18 +256,6 @@ public class MainActivity extends AppCompatActivity
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(currLocation));
     }
 
-
-    /*
-    !--------------------------------!
-    !--------------------------------!
-    !--------------------------------!
-    !--------------------------------!
-               OTHER BUTTONS
-    !--------------------------------!
-    !--------------------------------!
-    !--------------------------------!
-    !--------------------------------!
-     */
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -315,7 +305,10 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_manage) {
 
         } else if (id == R.id.nav_share) {
-
+            Intent intent = new Intent(this, MapActivity.class);
+            // intent.setData(Uri.fromFile(new File("file")));
+            // intent.setData(Uri.parse("firebase site"));
+            startActivity(intent);
         } else if (id == R.id.nav_send) {
             getLastKnownLocation();
             double latitude = this.location.getLatitude();
