@@ -2,6 +2,7 @@ package com.example.navtest1;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Service;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -13,6 +14,7 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -41,6 +43,14 @@ public class GetLocation extends Activity {
         this.location = getLocation();
     }
 
+    /**
+     * Determines if GPS/Network is available.
+     * Sets Location to Network (if available) then to GPS (if available)
+     * GPS has precedence.
+     * Alerts the user if GPS and Network are unavailable.
+     *
+     * @return A Location variable (use .getLatitude and .getLongitude to get details of Location)
+     */
     public Location getLocation() {
         try {
             mLocationManager = (LocationManager)mContext.getSystemService(LOCATION_SERVICE);
@@ -85,20 +95,12 @@ public class GetLocation extends Activity {
                     }
                 }
             }
-        } catch (Exception e){
+        } catch (SecurityException e){
             e.printStackTrace();
         }
 
         return this.location;
     }
-
-    /*
-    public void stopUsingGPS() {
-        if (this.mLocationManager != null) {
-            this.mLocationManager.removeUpdates(GetLocation.this);
-        }
-    }
-    */
 
     public double getLatitude() {
         if (this.location != null) {
@@ -120,79 +122,35 @@ public class GetLocation extends Activity {
         return this.canGetLocation;
     }
 
-    private boolean isLocationEnabled(Context context) {
-        LocationManager lm = (LocationManager)context.getSystemService(Context.LOCATION_SERVICE);
-        boolean gps = false;
-        boolean network = false;
-
-        try {
-            gps = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        } catch(Exception ex) {}
-
-        try {
-            network = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-        } catch(Exception ex) {}
-
-        if (!gps && !network) {
-            AlertDialog.Builder dialog = new AlertDialog.Builder(context);
-            dialog.setMessage("GPS Network Not Available!");
-            dialog.setPositiveButton("Open location settings?", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface paramDialogInterface, int paramInt) {
-                    // TODO Auto-generated method stub
-                    Intent myIntent = new Intent( Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                    startActivity(myIntent);
-                    //get gps
-                }
-            });
-            dialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-
-                @Override
-                public void onClick(DialogInterface paramDialogInterface, int paramInt) {
-                    // TODO Auto-generated method stub
-
-                }
-            });
-            dialog.show();
-        }
-        return true;
-    }
-
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        try {
-            mFusedLocationClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
-                @Override
-                public void onSuccess(Location location) {
-                    if (location != null) {
-                        // What will we do with this location
-                        // Use the location to find the public facilities that are near this location
-                    }
+        Button button = (Button) findViewById(R.id.buttonmain2);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                GetLocation gps = new GetLocation(GetLocation.this);
+                if (gps.canGetLocation()) {
+                    double latitude = gps.getLatitude();
+                    double longitude = gps.getLongitude();
+
                 }
-            });
-        } catch (Exception e) {};
+            }
+        });
     }
 
     public void onClick(View v) {
-        flag = displayGpsStatus();
+        flag = isGPSEnabled();
     }
 
 
-    private boolean displayGpsStatus() {
-        ContentResolver contentResolver = getBaseContext().getContentResolver();
-
-        // Checks if GPS status is a go
-        boolean gpsStatus = Settings.Secure.isLocationProviderEnabled(contentResolver,
-                LocationManager.GPS_PROVIDER);
-
-
-        if (gpsStatus) {
-            return true;
-        } else {
-            return false;
-        }
+    public boolean isGPSEnabled() {
+        return this.isGPSEnabled;
     }
+
+    public boolean isNetworkEnabled() {
+        return this.isNetworkEnabled;
+    }
+
 }

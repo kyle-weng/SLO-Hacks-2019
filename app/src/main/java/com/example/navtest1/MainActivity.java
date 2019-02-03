@@ -1,8 +1,13 @@
 package com.example.navtest1;
 
+import android.Manifest;
+import android.app.Activity;
+import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.location.LocationListener;
+import android.location.LocationManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
@@ -28,46 +33,154 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.Api;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.LocationServices;
-// import com.google.android.gms.location.places.GeoDataClient;
-// import com.google.android.gms.location.places.PlaceDetectionClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 
-import java.io.FileDescriptor;
-import java.io.PrintWriter;
-import java.util.concurrent.TimeUnit;
-
-/*
-import com.google.android.gms.maps;
-import com.google.android.gms.maps.GoogleMap.OnMapLongClickListener;
-import com.google.android.gms.maps.LocationSource;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.LatLng;
-*/
-
+import static com.example.navtest1.Constants.ERROR_DIALOG_REQUEST;
+import static com.example.navtest1.Constants.PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION;
+import static com.example.navtest1.Constants.PERMISSIONS_REQUEST_ENABLE_GPS;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     private FusedLocationProviderClient mFusedLocationClient;
+    private final String TAG = "MainActivity";
+    private boolean mLocationPermissionGranted = false;
+    private Location location = new Location("");
 
+
+
+
+    // https://www.youtube.com/watch?v=ZXXoIDj2pR0&list=PLgCYzUzKIBE-SZUrVOsbYMzH7tPigT3gi&index=6
+
+
+    private void getLocationPermission() {
+        if (ContextCompat.checkSelfPermission(this.getApplicationContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            mLocationPermissionGranted = true;
+            getLastKnownLocation();
+        } else {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+        }
+    }
+
+    public boolean isServicesOK(){
+        Log.d(TAG, "isServicesOK: checking google services version");
+
+        int available = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(MainActivity.this);
+
+        if(available == ConnectionResult.SUCCESS){
+            // Everything is fine and the user can make map requests
+            Log.d(TAG, "isServicesOK: Google Play Services is working");
+            return true;
+        } else if(GoogleApiAvailability.getInstance().isUserResolvableError(available)){
+            // An error occured but we can resolve it
+            Log.d(TAG, "isServicesOK: an error occured but we can fix it");
+            Dialog dialog = GoogleApiAvailability.getInstance().getErrorDialog(MainActivity.this, available, ERROR_DIALOG_REQUEST);
+            dialog.show();
+        } else {
+            Toast.makeText(this, "You can't make map requests", Toast.LENGTH_SHORT).show();
+        }
+        return false;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String permissions[],
+                                           @NonNull int[] grantResults) {
+        mLocationPermissionGranted = false;
+        switch (requestCode) {
+            case PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION: {
+                if (grantResults.length > 0 &&
+                    grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    mLocationPermissionGranted = true;
+                }
+            }
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.d(TAG, "onActivityResult: called.");
+        switch (requestCode) {
+            case PERMISSIONS_REQUEST_ENABLE_GPS: {
+                if(mLocationPermissionGranted){
+                    getLastKnownLocation();
+                }
+                else{
+                    getLocationPermission();
+                }
+            }
+        }
+
+    }
+    // No access to coarse location or fine location
+    // We will only use fine location
+    private void getLastKnownLocation() {
+        Log.d(TAG, "getLastKnownLocation: called.");
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // The code is entering this place each time.
+            this.getLocationPermission();
+            return;
+        } else {
+
+            mFusedLocationClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
+                @Override
+                public void onComplete(@NonNull Task<Location> task) {
+                    if (task.isSuccessful()) {
+                        location = task.getResult();
+                        // GeoPoint geoPoint = new GeoPoint(location.getLatitude(), location.getLongitude());
+                        Log.d(TAG, "onComplete: latitude: " + location.getLatitude());
+                        Log.d(TAG, "onComplete: longitude: " + location.getLongitude());
+                    }
+                }
+            });
+        }
+    }
+    /**
+     * Checks if maps/GPS provider is enabled
+     * @return true if enabled; false if disabled
+     */
+    public boolean isMapsEnabled() {
+        final LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * On building the app, this creates
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+        getLastKnownLocation();
         // mGoogleApiClient = new GoogleApiClient.Builder()
         // mGeoDataClient = Places.getGeoDataClient(this, null);
 
-        Button button1 = (Button) findViewById(R.id.button1);
+
+
+        Button button1 = (Button) findViewById(R.id.buttonmain2);
         button1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -75,23 +188,41 @@ public class MainActivity extends AppCompatActivity
                 Uri gmmIntentUri = Uri.parse("geo:36, -117");
                 Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
                 mapIntent.setPackage("com.google.android.apps.maps");
-                if(mapIntent.resolveActivity(getPackageManager()) != null) {
+                if (mapIntent.resolveActivity(getPackageManager()) != null) {
                     startActivity(mapIntent);
                 }
             }
         });
 
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        mFusedLocationClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
+        Button buttonCurrentLocation = (Button) findViewById(R.id.button1);
+        buttonCurrentLocation.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onSuccess(Location location) {
-                if (location != null) {
-                    // What will we do with this location
-                    // Use the location to find the public facilities that are near this location
+            public void onClick(View v) {
+                double latitude = 42.0;
+                double longitude = -71.0;
+                getLastKnownLocation();
+                latitude = location.getLatitude();
+                longitude = location.getLongitude();
+                Uri gmmIntentUri = Uri.parse("geo:" + latitude + ", " + longitude);
+                Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+                mapIntent.setPackage("com.google.android.apps.maps");
+                if (mapIntent.resolveActivity(getPackageManager()) != null) {
+                    startActivity(mapIntent);
                 }
+
+
+                /*
+                GetLocation gps = new GetLocation();
+                if (gps.canGetLocation()) {
+                    latitude = gps.getLatitude();
+                    longitude = gps.getLongitude();
+                } else {
+                    latitude = 42.0;
+                    longitude = -71.0;
+                }
+                */
             }
         });
-
 
         Button b2 = (Button) findViewById(R.id.buttonmain1);
         b2.setOnClickListener(new View.OnClickListener() {
@@ -99,16 +230,6 @@ public class MainActivity extends AppCompatActivity
             public void onClick(View view) {
                 /*
                 Insert code for "button"
-                 */
-            }
-        });
-
-        Button b3 = (Button) findViewById(R.id.buttonmain2);
-        b3.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                /*
-                Insert code for "Drop a marker"
                  */
             }
         });
@@ -132,6 +253,20 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
     }
 
+
+
+
+    /*
+    !--------------------------------!
+    !--------------------------------!
+    !--------------------------------!
+    !--------------------------------!
+               OTHER BUTTONS
+    !--------------------------------!
+    !--------------------------------!
+    !--------------------------------!
+    !--------------------------------!
+     */
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
