@@ -298,7 +298,7 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_share) {
             Intent intent = new Intent(this, MapActivity.class);
             // intent.setData(Uri.fromFile(new File("file")));
-            // intent.setData(Uri.parse("firebase site"));
+            intent.setData(Uri.parse("gs://slo-hacks-2019-60f66.appspot.com"));
             startActivity(intent);
         } else if (id == R.id.nav_send) {
             getLastKnownLocation();

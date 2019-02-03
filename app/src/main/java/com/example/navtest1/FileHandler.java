@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.google.android.gms.auth.api.signin.internal.Storage;
+import com.google.android.gms.common.util.IOUtils;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FileDownloadTask;
@@ -18,6 +19,7 @@ import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -25,14 +27,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
-import java.nio.file.Files;
 
 public class FileHandler {
     private Context testContext;
     //private FileHandler handler;
     private FirebaseStorage storage;
     private StorageReference mStorageRef;
-    private Uri identifier;
     private ObjectOutput out;
     private static final String URL = "gs://slo-hacks-2019-60f66.appspot.com";
     private static final String TAG = "FileHandler";
@@ -44,13 +44,30 @@ public class FileHandler {
         //handler = new FileHandler();
         this.storage = FirebaseStorage.getInstance();
         this.mStorageRef = storage.getReferenceFromUrl(URL);
-        this.identifier = null;
         //poi = null;
         this.out = null;
     }
 
-    public void setIdentifier(String filepath) {
-        identifier = Uri.fromFile(new File(filepath));
+    public InputStream fileToInputStream(File in) throws IOException {
+        File initialFile = new File("src/main/resources/sample.txt");
+        InputStream targetStream = new FileInputStream(initialFile);
+        return targetStream;
+    }
+
+    /*
+     * This is a good link which talks about IOUtils versus manually writing a byte array output stream.
+     * The below solution implements the second method
+     * https://stackoverflow.com/questions/11540018/android-compile-error-util-tobytearray-taken-from-an-example
+     */
+    public byte[] inputStreamToByteArray(InputStream in) throws IOException {
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        int l;
+        byte[] data = new byte[1024];
+        while ((l = in.read(data, 0, data.length)) != -1) {
+            buffer.write(data, 0, l);
+        }
+        buffer.flush();
+        return buffer.toByteArray();
     }
 
     public byte[] convertToByteArray(PointOfInterest in) {
@@ -98,7 +115,7 @@ public class FileHandler {
      * https://stackoverflow.com/questions/5837698/converting-any-object-to-a-byte-array-in-java
      * this is the sketchiest thing in the world pls test
      */
-    public PointOfInterest deserialize(byte[] bytes) throws IOException, ClassNotFoundException {
+    public PointOfInterest deserializeBytes(byte[] bytes) throws IOException, ClassNotFoundException {
         try(ByteArrayInputStream b = new ByteArrayInputStream(bytes)){
             try(ObjectInputStream o = new ObjectInputStream(b)){
                 return (PointOfInterest)o.readObject();

@@ -14,15 +14,19 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MapActivity extends FragmentActivity implements OnMapReadyCallback{
+public class MapActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private List<PointOfInterest> locationList = new ArrayList<>();
+    private FileHandler handler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,9 +37,25 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback{
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         /*
-        Find a way to get locationList from an inputted file.
-
+         *Find a way to get locationList from each element in the cloud storage.
          */
+        handler = new FileHandler();
+        File test = handler.download("3d printing notes"); //THIS IS A STAND-IN FOR AN ACTUAL POI FILE
+
+        // Deseralize the file.
+        try {
+            InputStream stream = handler.fileToInputStream(test);
+            byte[] arr = handler.inputStreamToByteArray(stream);
+            PointOfInterest poi = handler.deserializeBytes(arr); //throwing class not found exception? will be fixed
+
+            locationList.add(poi);
+        } catch (Exception e) {
+            //Do nothing? Error fixing code tbd
+        }
+
+        //
+
+
         Intent intent = getIntent();
         Uri locationUri = intent.getData();
         // locationUri is the link for the firebase storage site?
@@ -46,30 +66,32 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback{
         mMap = googleMap;
         Map<String, PointOfInterest> bathroomLocations = new HashMap<>();
         /*
-        Take each value in the locationList and put them into the bathroomLocations map if their
-        ratings are above a certain threshold.
+         * Take each value in the locationList and put them into the bathroomLocations map if their
+         * ratings are above a certain threshold.
+         */
 
         for (PointOfInterest location : locationList) {
             if (location.checkThreshold()) {
                 bathroomLocations.put(location.getName(),
-                                        new PointOfInterest(location.getLoc().getLatitude(),
-                                                            location.getLoc().getLongitude(),
-                                                            location.getName(),
-                                                            location.getDescription()));
+                        new PointOfInterest(location.getLoc().getLatitude(),
+                                location.getLoc().getLongitude(),
+                                location.getName(),
+                                location.getDescription()));
             }
-         */
 
-        /*
-        Take each value in bathroomLocations and create a new marker
 
-        for (Map.Entry<String, PointOfInterest> entry : bathroomLocations.entrySet()) {
-            PointOfInterest currPOI = entry.getValue();
-            Location currLocation = currPOI.getLoc();
-            LatLng currLatLng = new LatLng(currLocation.getLatitude(), currLocation.getLongitude());
-            mMap.addMarker(new MarkerOptions().position(currLatLng)
-                    .title(currPOI.getName())
-                    .snippet(currPOI.getDescription()));
+            /*
+             * Take each value in bathroomLocations and create a new marker
+             */
+            for (Map.Entry<String, PointOfInterest> entry : bathroomLocations.entrySet()) {
+                PointOfInterest currPOI = entry.getValue();
+                Location currLocation = currPOI.getLoc();
+                LatLng currLatLng = new LatLng(currLocation.getLatitude(), currLocation.getLongitude());
+                mMap.addMarker(new MarkerOptions().position(currLatLng)
+                        .title(currPOI.getName())
+                        .snippet(currPOI.getDescription()));
+            }
+
         }
-         */
     }
 }
