@@ -7,7 +7,8 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-
+import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
 import java.io.File;
 
 public class FileHandler {
@@ -19,13 +20,8 @@ public class FileHandler {
         mStorageRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://slo-hacks-2019-230507.appspot.com/");
     }
 
-    public void setFile(String filepath) {
-        // Sets target file (for downloading) from an input string.
+    public File downloadFile(String filepath) {
         file = Uri.fromFile(new File(filepath));
-    }
-
-    public File downloadFile() {
-        
     }
 
 }
