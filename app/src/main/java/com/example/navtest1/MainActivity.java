@@ -67,11 +67,7 @@ public class MainActivity extends AppCompatActivity
     private boolean mLocationPermissionGranted = false;
     private Location location = new Location("");
 
-
-
-
-    // https://www.youtube.com/watch?v=ZXXoIDj2pR0&list=PLgCYzUzKIBE-SZUrVOsbYMzH7tPigT3gi&index=6
-
+    // https://www.youtube.com/watch?v=ZXXoIDj2pR0&list=PLgCYzUzKIBE-SZUrVOsbYMzH7tPigT3gi&index=
 
     private void getLocationPermission() {
         if (ContextCompat.checkSelfPermission(this.getApplicationContext(),
