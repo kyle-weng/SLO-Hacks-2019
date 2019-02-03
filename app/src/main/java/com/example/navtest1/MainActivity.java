@@ -177,9 +177,8 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-    //https://developer.android.com/reference/android/R.id
-
-mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        //https://developer.android.com/reference/android/R.id
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         getLastKnownLocation();
         
 
